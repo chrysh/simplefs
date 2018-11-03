@@ -16,8 +16,30 @@ static struct file_system_type simplefs_type = {
 //	.kill_sb = kill_litter_super,
 };
 
+#define SIMPLEFS_MAGIC_NUMBER 0xdeadbeef
+
+static void simplefs_put_super(struct super_block *sb)
+{
+    pr_debug("%s: simplefs super block destroyed\n", __FILE__);
+}
+
+static struct super_operations const simplefs_super_ops = {
+    .put_super = simplefs_put_super,
+};
+
 int simplefs_fill_super(struct super_block *sb, void *data, int silent)
 {
+    struct inode *root = NULL;
+
+    sb->s_magic = SIMPLEFS_MAGIC_NUMBER;
+    sb->s_op = &simplefs_super_ops;
+
+    root = new_inode(sb);
+    if (!root)
+    {
+        pr_err("%s: %s failed\n", __FILE__, __FUNCTION__);
+        return -ENOMEM;
+    }
     printk(KERN_INFO "Fill in superblock for simplefs\n");
     return 0;
 }
