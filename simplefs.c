@@ -30,6 +30,7 @@ static struct super_operations const simplefs_super_ops = {
 int simplefs_fill_super(struct super_block *sb, void *data, int silent)
 {
     struct inode *root = NULL;
+    printk(KERN_INFO "Fill in superblock for simplefs\n");
 
     sb->s_magic = SIMPLEFS_MAGIC_NUMBER;
     sb->s_op = &simplefs_super_ops;
@@ -40,7 +41,18 @@ int simplefs_fill_super(struct super_block *sb, void *data, int silent)
         pr_err("%s: %s failed\n", __FILE__, __FUNCTION__);
         return -ENOMEM;
     }
-    printk(KERN_INFO "Fill in superblock for simplefs\n");
+
+    root->i_ino = 0;
+    root->i_sb = sb;
+    //root->i_atime = root->i_mtime = root->i_ctime = 123456;
+    inode_init_owner(root, NULL, S_IFDIR);
+
+    sb->s_root = d_make_root(root);
+    if (!sb->s_root)
+    {
+        pr_err("root creation failed\n");
+        return -ENOMEM;
+    }
     return 0;
 }
 
