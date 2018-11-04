@@ -13,7 +13,7 @@ static struct file_system_type simplefs_type = {
     .owner = THIS_MODULE,
 	.name = "simplefs",
 	.mount = simplefs_mount,
-//	.kill_sb = kill_litter_super,
+	.kill_sb = kill_block_super,
 };
 
 #define SIMPLEFS_MAGIC_NUMBER 0xdeadbeef
